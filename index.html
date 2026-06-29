@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym Timer</title>
+    
+    <!-- Dit à Safari que c'est une PWA installable -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Cache la barre d'adresse quand elle est installée -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <!-- Le nom qui apparaît sous l'icône sur l'écran d'accueil -->
+    <meta name="apple-mobile-web-app-title" content="Gym Timer" />
+    <style>
+      /* Le style général de la page */
+      body {
+        font-family: sans-serif;
+        background-color: #1a1a2e;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      /* La carte centrale */
+      .carte {
+        background-color: #16213e;
+        border-radius: 24px;
+        padding: 40px 32px;
+        text-align: center;
+        width: 300px;
+      }
+
+      /* Le label "Temps de repos" */
+      .label {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 8px;
+      }
+
+      /* Le grand affichage du timer */
+      .timer {
+        font-size: 80px;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      /* Les boutons +15s / -15s */
+      .ajustements {
+        display: flex;
+        gap: 12px;
+        margin: 24px 0 16px;
+      }
+
+      .btn-ajust {
+        flex: 1;
+        padding: 12px;
+        font-size: 14px;
+        background: transparent;
+        border: 1px solid #444;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+      }
+
+      /* Le bouton GO */
+      .btn-go {
+        width: 100%;
+        padding: 16px;
+        font-size: 20px;
+        font-weight: bold;
+        background-color: #0f3460;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        letter-spacing: 2px;
+      }
+      .barre-fond {
+        height: 6px;
+        background-color: #333;
+        border-radius: 99px;
+        margin: 24px 0;
+        overflow: hidden;
+        }
+
+    .barre-remplissage {
+        height: 100%;
+        width: 100%;
+        background-color: #4cc9f0;
+        border-radius: 99px;
+        transition: width 0.9s linear;
+    }
+    .timer.danger {
+        color: #ff4444;
+    }
+
+    .barre-remplissage.danger {
+        background-color: #ff4444;
+    }
+    .btn-reset {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+        background: transparent;
+        border: 1px solid #444;
+        border-radius: 12px;
+        color: #888;
+        cursor: pointer;
+        margin-top: 10px;
+        }
+    </style>
+  </head>
+
+  <body>
+    <div class="carte">
+      <p class="label">Temps de repos</p>
+      <p class="timer">1:30</p>
+      <div class="barre-fond">
+        <div class="barre-remplissage" id="barre"></div>
+    </div>
+
+      <div class="ajustements">
+        <button class="btn-ajust">− 15s</button>
+        <button class="btn-ajust">+ 15s</button>
+      </div>
+
+      <button class="btn-go">GO</button>
+      <button class="btn-reset" id="reset">↺ Recommencer</button>
+    </div>
+    <script>
+
+  let tempsTotal = 90
+  let tempsRestant = 90
+  let timerActif = false
+  let intervalle = null
+
+
+  function afficherTemps() {
+    let minutes = Math.floor(tempsRestant / 60)
+    let secondes = tempsRestant % 60
+    if (secondes < 10) secondes = "0" + secondes
+    document.querySelector(".timer").textContent = minutes + ":" + secondes
+  }
+    function mettreAJourBarre() {
+  let pourcentage = (tempsRestant / tempsTotal) * 100
+  document.getElementById("barre").style.width = pourcentage + "%"
+
+  let timer = document.querySelector(".timer")
+  let barre = document.getElementById("barre")
+
+  if (tempsRestant <= 10) {
+    timer.classList.add("danger")
+    barre.classList.add("danger")
+  } else {
+    timer.classList.remove("danger")
+    barre.classList.remove("danger")
+  }
+}
+
+
+  // --- LE SON (Web Audio API) ---
+  function jouerSon() {
+    let contexte = new AudioContext()
+
+    // On crée 3 bips courts qui se suivent
+    let moments = [0, 0.25, 0.5]
+
+    moments.forEach(function(quand) {
+      let oscillateur = contexte.createOscillator()
+      let volume = contexte.createGain()
+
+      oscillateur.connect(volume)
+      volume.connect(contexte.destination)
+
+      oscillateur.frequency.value = 880   // hauteur du son (Hz)
+      volume.gain.setValueAtTime(0.6, contexte.currentTime + quand)
+      volume.gain.exponentialRampToValueAtTime(0.001, contexte.currentTime + quand + 0.2)
+
+      oscillateur.start(contexte.currentTime + quand)
+      oscillateur.stop(contexte.currentTime + quand + 0.2)
+    })
+  }
+
+
+  // --- LA VIBRATION ---
+  function vibrer() {
+    if (navigator.vibrate) {
+      navigator.vibrate([300, 100, 300, 100, 300])
+    }
+  }
+
+
+  // --- BOUTON GO ---
+  document.querySelector(".btn-go").addEventListener("click", function() {
+
+    if (timerActif) return
+
+    timerActif = true
+    tempsRestant = tempsTotal
+    mettreAJourBarre()
+    document.querySelector(".btn-go").textContent = "EN COURS..."
+
+    intervalle = setInterval(function() {
+
+      tempsRestant -= 1
+      afficherTemps()
+      mettreAJourBarre()
+
+      // Bips d'alerte à 3 secondes de la fin
+      if (tempsRestant === 3) {
+        jouerSon()
+      }
+
+      if (tempsRestant <= 0) {
+        clearInterval(intervalle)
+        timerActif = false
+        document.querySelector(".timer").textContent = "GO !"
+        document.querySelector(".btn-go").textContent = "GO"
+        vibrer()
+        jouerSon()
+      }
+
+    }, 1000)
+
+  })
+
+
+  // --- BOUTON −15s ---
+  document.querySelectorAll(".btn-ajust")[0].addEventListener("click", function() {
+    if (!timerActif && tempsTotal > 15) {
+      tempsTotal -= 15
+      tempsRestant = tempsTotal
+      afficherTemps()
+    }
+  })
+
+
+  // --- BOUTON +15s ---
+  document.querySelectorAll(".btn-ajust")[1].addEventListener("click", function() {
+    if (!timerActif) {
+      tempsTotal += 15
+      tempsRestant = tempsTotal
+      afficherTemps()
+    }
+  })
+    // --- BOUTON RESET ---
+document.getElementById("reset").addEventListener("click", function() {
+  clearInterval(intervalle)
+  timerActif = false
+  tempsRestant = tempsTotal
+
+  document.querySelector(".timer").textContent = ""
+  document.querySelector(".btn-go").textContent = "GO"
+  document.getElementById("barre").style.width = "100%"
+
+  let timer = document.querySelector(".timer")
+  let barre = document.getElementById("barre")
+  timer.classList.remove("danger")
+  barre.classList.remove("danger")
+
+  afficherTemps()
+})
+
+</script>
+  </body>
+</html>
