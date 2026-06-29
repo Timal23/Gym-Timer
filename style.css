@@ -1,0 +1,105 @@
+body {
+  font-family: sans-serif;
+  background-color: #1a1a2e;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.carte {
+  background-color: #16213e;
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  width: 300px;
+}
+
+.label {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.timer {
+  font-size: 80px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.timer.danger {
+  color: #ff4444;
+}
+
+.barre-fond {
+  height: 6px;
+  background-color: #333;
+  border-radius: 99px;
+  margin: 24px 0;
+  overflow: hidden;
+}
+
+.barre-remplissage {
+  height: 100%;
+  width: 100%;
+  background-color: #4cc9f0;
+  border-radius: 99px;
+  transition: width 0.9s linear;
+}
+
+.barre-remplissage.danger {
+  background-color: #ff4444;
+}
+
+.ajustements {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+
+.btn-ajust {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  background: transparent;
+  border: 1px solid #444;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-go {
+  width: 100%;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
+  background-color: #0f3460;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  letter-spacing: 2px;
+}
+
+.btn-reset {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  background: transparent;
+  border: 1px solid #444;
+  border-radius: 12px;
+  color: #888;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+@keyframes clignoter {
+    0%, 100% {opacity: 1;}
+    50% {opacity: 0;}
+}
+
+.timer.clignote{
+    animation: clignoter 0.4s ease-in-out 6;
+}
