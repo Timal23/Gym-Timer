@@ -12,6 +12,13 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: -webkit-fill-available;  
+  margin: 0;
+  padding: env(safe-area-inset-top) en(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.html {
+  height: -webkit-fill-available;
 }
 
 /* --- SPLASH --- */
@@ -73,6 +80,7 @@ body {
   font-weight: 800;
   background: linear-gradient(135deg, #ff6a00, #ee0979);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1;
   margin-bottom: 4px;
@@ -81,6 +89,7 @@ body {
 .timer.danger {
   background: linear-gradient(135deg, #ff0000, #ff6a00);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
