@@ -15,6 +15,7 @@ let timerActif = false
 let intervalle = null
 let wakeLock = null
 let contexteAudio = null
+let nombreTours = 0
 
 
 // --- WAKE LOCK ---
@@ -121,7 +122,7 @@ document.querySelector(".btn-go").addEventListener("click", function() {
   contexteAudio = new AudioContext()
   tempsRestant = tempsTotal
   activerWakeLock()
-  document.querySelector(".btn-go").textContent = "EN COURS..."
+  document.querySelector(".btn-go").textContent = "..."
 
   intervalle = setInterval(function() {
     tempsRestant -= 1
@@ -135,6 +136,8 @@ document.querySelector(".btn-go").addEventListener("click", function() {
     if (tempsRestant <= 0) {
       clearInterval(intervalle)
       timerActif = false
+      nombreTours += 1
+      document.getElementById("compteur").textContent = nombreTours
       desactiverWakeLock()
       document.querySelector(".timer").textContent = "GO !"
       document.querySelector(".btn-go").textContent = "GO"
@@ -145,6 +148,20 @@ document.querySelector(".btn-go").addEventListener("click", function() {
       setTimeout(function() {
         document.querySelector(".timer").classList.remove("clignote")
       }, 3000)
+
+      setTimeout(function() {
+        tempsRestant = tempsTotal
+        afficherTemps()
+        document.getElementById("barre").style.width = "100%"
+
+        let timer = document.querySelector(".timer")
+        let barre = document.getElementById("barre")
+        timer.classList.remove("danger")
+        timer.classList.remove("clignote")
+        barre.classList.remove("danger")
+
+        document.querySelector(".btn-go").textContent = "GO"
+      }, 5000)
     }
 
   }, 1000)
@@ -152,7 +169,7 @@ document.querySelector(".btn-go").addEventListener("click", function() {
 
 
 // --- BOUTON −15s ---
-document.querySelectorAll(".btn-ajust")[0].addEventListener("click", function() {
+document.getElementById("moins15").addEventListener("click", function() {
   if (!timerActif && tempsTotal > 15) {
     tempsTotal -= 15
     tempsRestant = tempsTotal
@@ -162,9 +179,24 @@ document.querySelectorAll(".btn-ajust")[0].addEventListener("click", function() 
 
 
 // --- BOUTON +15s ---
-document.querySelectorAll(".btn-ajust")[1].addEventListener("click", function() {
+document.getElementById("plus15").addEventListener("click", function() {
   if (!timerActif) {
     tempsTotal += 15
+    tempsRestant = tempsTotal
+    afficherTemps()
+  }
+})
+
+document.getElementById("moins5").addEventListener("click", function() {
+  if(!timerActif && tempsTotal > 5){
+    tempsTotal -= 5
+    tempsRestant = tempsTotal
+    afficherTemps()
+  }
+})
+document.getElementById("plus5").addEventListener("click", function() {
+  if(!timerActif ){
+    tempsTotal += 5
     tempsRestant = tempsTotal
     afficherTemps()
   }
@@ -175,6 +207,8 @@ document.querySelectorAll(".btn-ajust")[1].addEventListener("click", function() 
 document.getElementById("reset").addEventListener("click", function() {
   clearInterval(intervalle)
   timerActif = false
+  nombreTours = 0
+  document.getElementById("compteur").textContent = 0
   desactiverWakeLock()
   tempsRestant = tempsTotal
 

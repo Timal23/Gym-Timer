@@ -21,18 +21,25 @@
     <div class="carte">
       <p class="label">Temps de repos</p>
       <p class="timer">1:30</p>
+      <p class="tours">Série <span id="compteur">0</span></p>
 
       <div class="barre-fond">
         <div class="barre-remplissage" id="barre"></div>
       </div>
 
       <div class="ajustements">
-        <button class="btn-ajust">− 15s</button>
-        <button class="btn-ajust">+ 15s</button>
+        <div class="rangee">
+          <button class="btn-ajust grand" id="moins15">− 15s</button>
+          <button class="btn-ajust grand" id="plus15">+ 15s</button>
+        </div>
+        <div class="rangee">
+          <button class="btn-ajust petit" id="moins5">− 5s</button>
+          <button class="btn-ajust petit" id="plus5">+ 5s</button>
+        </div>
       </div>
 
       <button class="btn-go">GO</button>
-      <button class="btn-reset" id="reset">↺ Recommencer</button>
+      <button class="btn-reset" id="reset">↺</button>
     </div>
 
     <script src="script.js"></script>
